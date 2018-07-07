@@ -11,7 +11,7 @@ excerpt: >
 
 There's been a lot of discussion about configuration in the community lately.
 We thought this would be an opportune time to discuss configuration and how best to handle it within an Elixir application.
-It is surprising to see how a small change to our applications configuration can eliminate much of the headaches others are experiencing._
+It is surprising to see how a small change to our applications configuration can eliminate much of the headaches others are experiencing.
 
 ### Configuration types
 
@@ -23,13 +23,12 @@ If you've ever used a system environment variable to configure some part of your
 As the name suggests, this is the configuration for an application at the time it is run.
 These are the values we can expect to change as we deploy our build artifacts to different systems.
 
-__Application Configuration__
+__Build-time Configuration__
 
-Application configuration is something different, and the difference, while subtle, can be a pitfall in certain situations.
-The difference shines when we consider that our code, and it's configuration, is compiled into a build artifact we can distribute.
+Build-time, or Application, configuration is something different, and the difference, while subtle, can be a pitfall in certain situations.
+The difference shines when we consider that our code, and its configuration, is compiled into a build artifact we can distribute.
 
-We can say with certainty that no matter where our application is run there are certain things we want to remain constant.
-No matter where we deploy our application, we want know we want to use the same `Logger` configuration.
+We can say with certainty that no matter where our application is run there are certain things we want to remain constant; we intend to use the same `Logger` configuration regardless of where we deploy.
 If we're relying on dependency injection for testing, then we know for certain we don't want to use those dependencies in the final deliverable.
 They configure the function of our code.
 
@@ -56,23 +55,23 @@ Wrong!
 Our application's configuration, defined in `config.exs` and friends, is compiled when we generate build artifacts, like those produced by Distillery.
 That means those `System.get_env/1` functions need to be resolved at compile time.
 See the problem?
-Our application's code is coupled to our system configuration.
+Our application's compiled code is coupled to the configuration of the system where it was compiled.
 
 What if we want to generate the build artifact locally and run it elsewhere?
 What if there's an emergency and the value of `EXAMPLE_APP_HOSTNAME` has been updated?
-With this configuration our application needs to be precompile for changes to take effect.
+With this configuration our application needs to be recompile for changes to take effect.
 
 Let's illustrate the concept using colors to differeniate changes:
 
 ![elixir-config-recompile](https://user-images.githubusercontent.com/73386/41503026-d8a66ef4-7185-11e8-95fa-37598f6a56ff.png)
 
-Here we see that our runtimes values are different, which required we recompile our code.
+Here we see that our runtimes values are different, which required us to recompile our code.
 This results in a new build artifact and updated configuration for Runtime B.
 We've managed to couple the runtime configuration and code together.
 To see changes in our environment reflected in our code recompilation is unavoidable.
-For those using Releases this combobulation of configuration types often times requires additional libraries to fill the gaps.
+For those using releases this combination of configuration types often times requires additional libraries to fill the gaps.
 
-At it's root, the problem is the conflation of two separate concepts: application configuration and runtime configuration.
+At its root, the problem is the conflation of two separate concepts: build-time and runtime configuration.
 
 ### A new approach
 
@@ -155,6 +154,6 @@ end
 
 When our application starts it will attempt to retrieve those system variables, removing the `nil` values, and finally merging the options defined by our application configuration with the runtime configuration, giving precedence to the runtime options.
 
-Now we can use the `dev.exs` and `test.exs` files we're so accustomed to while also ensuring our final build artifact will be correctly setup, thus making configuration of deployments a breeze.
+Now we can use the `dev.exs` and `test.exs` files we're so accustomed to while also ensuring our final build artifact will be correctly set up, thus making configuration of deployments a breeze.
 
 What do you think of this approach?  We'd love to hear your thoughts!
