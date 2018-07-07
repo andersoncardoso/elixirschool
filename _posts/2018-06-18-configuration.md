@@ -156,4 +156,7 @@ When our application starts it will attempt to retrieve those system variables, 
 
 Now we can use the `dev.exs` and `test.exs` files we're so accustomed to while also ensuring our final build artifact will be correctly set up, thus making configuration of deployments a breeze.
 
-What do you think of this approach?  We'd love to hear your thoughts!
+What do you think of this approach?
+We'd love to hear your thoughts!
+
+In our next configuration post we'll look at how to design our libraries in a way to remove the need for `Application.get_env/2` while at the same time allowing multiple, independently configured, instances to live within the same application.
